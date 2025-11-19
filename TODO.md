@@ -1,1 +1,2 @@
-- [ ] ...
+- [ ] Refacto vue TS + express TS
+- [ ] Faire synchro des donnée en fond

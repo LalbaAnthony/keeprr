@@ -1,2 +1,2 @@
 - [ ] Refacto vue TS + express TS
-- [ ] Faire synchro des donnée en fond
+- [ ] Faire synchro des donnée en fond comme pensé sur memo-minder

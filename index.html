@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Keeprr</title>
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind config for dark mode and custom colors
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1f2937', // slate-800 feel
+            accent: '#10b981'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Small custom styles for the modal backdrop and drag cursor */
+    .modal-backdrop { background: rgba(2,6,23,0.7); }
+    .dragging { opacity: 0.5; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100 antialiased">
+  <div class="max-w-6xl mx-auto p-4">
+    <header class="flex items-center justify-between gap-4 mb-4">
+      <div class="flex items-center gap-4">
+        <h1 class="text-2xl font-semibold">Keeprr</h1>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label class="flex items-center gap-2 text-sm text-slate-300">
+          <input id="toggleSort" type="checkbox" class="accent-accent w-4 h-4" title="Toggle manual ordering" />
+          Manual order
+        </label>
+        <button id="newNoteBtn" class="ml-2 bg-accent/90 hover:bg-accent px-3 py-1 rounded-md text-slate-900 font-medium">New</button>
+        <button id="resetBtn" class="ml-2 px-3 py-1 rounded-md border border-slate-700 text-sm text-slate-300">Unsort</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Notes list -->
+      <section id="notesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- Notes rendered here -->
+      </section>
+
+      <p id="emptyMsg" class="text-center text-slate-500 mt-8 hidden">No notes yet. Click "New note" to create one.</p>
+    </main>
+
+    <footer class="mt-6 text-xs text-slate-500">Notes are saved only in your browser (localStorage).</footer>
+  </div>
+
+  <!-- Modal (popup) to edit/create note -->
+  <div id="modal" class="fixed inset-0 hidden items-center justify-center z-50">
+    <div class="modal-backdrop absolute inset-0"></div>
+    <div class="relative w-full max-w-2xl mx-4">
+      <div class="bg-slate-800 rounded-xl p-4 shadow-2xl">
+        <div class="flex items-center justify-between mb-2">
+          <h2 id="modalTitle" class="text-lg font-semibold">Edit note</h2>
+          <div class="flex items-center gap-2">
+            <span id="updatedAt" class="text-xs text-slate-400"></span>
+            <button id="closeModal" class="px-3 py-1 rounded-md border border-slate-700 text-sm">Close</button>
+          </div>
+        </div>
+
+        <input id="noteTitle" placeholder="Title" class="w-full bg-slate-900/40 rounded-md p-2 mb-2 text-slate-100 placeholder-slate-400" />
+        <textarea id="noteBody" rows="10" placeholder="Write your note in plain text..." class="w-full bg-slate-900/40 rounded-md p-2 text-slate-100 placeholder-slate-400"></textarea>
+
+        <div class="flex items-center justify-between mt-3">
+          <div class="flex items-center gap-2">
+            <button id="saveBtn" class="bg-accent/90 hover:bg-accent px-3 py-1 rounded-md text-slate-900 font-medium">Save</button>
+            <button id="deleteBtn" class="px-3 py-1 rounded-md border border-red-600 text-red-400">Delete</button>
+          </div>
+          <div class="text-xs text-slate-400">Tips: The first line will be used as main title if left empty.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'keeprr';
+
+    // State
+    let notes = []; // {id, title, body, updatedAt, manualOrderIndex}
+    let editingId = null;
+    let manualOrdering = false;
+    let dragSrcId = null;
+
+    // Elements
+    const notesGrid = document.getElementById('notesGrid');
+    const emptyMsg = document.getElementById('emptyMsg');
+    const newNoteBtn = document.getElementById('newNoteBtn');
+    const modal = document.getElementById('modal');
+    const noteTitle = document.getElementById('noteTitle');
+    const noteBody = document.getElementById('noteBody');
+    const saveBtn = document.getElementById('saveBtn');
+    const closeModal = document.getElementById('closeModal');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const updatedAtEl = document.getElementById('updatedAt');
+    const toggleSort = document.getElementById('toggleSort');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Helpers
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+    function nowISO() { return new Date().toISOString(); }
+    function niceDate(iso) {
+      const d = new Date(iso);
+      return d.toLocaleString();
+    }
+
+    function loadNotes() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        notes = raw ? JSON.parse(raw) : [];
+      } catch (e) { notes = []; }
+    }
+
+    function saveNotes() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    }
+
+    function createNote() {
+      const id = uid();
+      const newNote = { id, title: '', body: '', updatedAt: nowISO(), manualOrderIndex: notes.length };
+      notes.unshift(newNote);
+      editingId = id;
+      saveNotes();
+      renderNotes();
+      openModal(id);
+    }
+
+    function openModal(id) {
+      editingId = id;
+      const note = notes.find(n => n.id === id);
+      if (!note) return;
+      noteTitle.value = note.title || '';
+      noteBody.value = note.body || '';
+      updatedAtEl.textContent = 'Last updated: ' + niceDate(note.updatedAt);
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      noteTitle.focus();
+    }
+
+    function closeModalFn() {
+      editingId = null;
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    function saveEditing() {
+      if (!editingId) return;
+      const note = notes.find(n => n.id === editingId);
+      if (!note) return;
+      const prev = note.body + note.title;
+      note.title = noteTitle.value.trim();
+      note.body = noteBody.value;
+      note.updatedAt = nowISO();
+      // If title empty, use first line of body or fallback
+      if (!note.title) {
+        const firstLine = note.body.split('\n').find(l => l.trim());
+        note.title = firstLine ? firstLine.slice(0, 60) : 'Untitled';
+      }
+      // If manual ordering is off, keep auto sort (we'll resort on render)
+      saveNotes();
+      renderNotes();
+      closeModalFn();
+    }
+
+    function deleteNote(id) {
+      notes = notes.filter(n => n.id !== id);
+      saveNotes();
+      renderNotes();
+      closeModalFn();
+    }
+
+    function renderNotes() {
+      // Decide ordering
+      if (!manualOrdering) {
+        notes.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      } else {
+        notes.sort((a,b) => (a.manualOrderIndex ?? 0) - (b.manualOrderIndex ?? 0));
+      }
+
+      // UI
+      notesGrid.innerHTML = '';
+      if (notes.length === 0) {
+        emptyMsg.classList.remove('hidden');
+      } else {
+        emptyMsg.classList.add('hidden');
+      }
+
+      notes.forEach(note => {
+        const card = document.createElement('article');
+        card.className = 'bg-slate-800 rounded-lg p-3 min-h-[120px] cursor-pointer flex flex-col justify-between hover:shadow-lg';
+        card.setAttribute('draggable', 'true');
+        card.dataset.id = note.id;
+
+        // header
+        const h = document.createElement('div');
+        h.className = 'flex items-start justify-between gap-2';
+
+        const title = document.createElement('h3');
+        title.className = 'font-semibold text-sm break-words';
+        title.textContent = note.title || (note.body.split('\n')[0] || 'Untitled');
+
+        const meta = document.createElement('div');
+        meta.className = 'text-xs text-slate-400';
+        meta.textContent = niceDate(note.updatedAt);
+
+        h.appendChild(title);
+        h.appendChild(meta);
+
+        // body preview
+        const p = document.createElement('pre');
+        p.className = 'text-sm text-slate-300 mt-2 whitespace-pre-wrap overflow-hidden max-h-[6rem]';
+        p.textContent = note.body || '';
+
+        // footer - move handle
+        const footer = document.createElement('div');
+        footer.className = 'flex items-center justify-between mt-3';
+
+        const actions = document.createElement('div');
+        actions.className = 'flex items-center gap-2';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'text-xs px-2 py-1 rounded-md border border-slate-700';
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = (e) => { e.stopPropagation(); openModal(note.id); };
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'text-xs px-2 py-1 rounded-md border border-red-700 text-red-300';
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = (e) => { e.stopPropagation(); if (confirm('Delete this note?')) deleteNote(note.id); };
+
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+
+        const dragHandle = document.createElement('div');
+        dragHandle.className = 'text-xs text-slate-400 select-none';
+        dragHandle.textContent = '⋮⋮';
+        dragHandle.title = 'Drag to reorder';
+
+        footer.appendChild(actions);
+        footer.appendChild(dragHandle);
+
+        card.appendChild(h);
+        card.appendChild(p);
+        card.appendChild(footer);
+
+        // Events
+        card.addEventListener('click', () => openModal(note.id));
+
+        card.addEventListener('dragstart', (ev) => {
+          dragSrcId = note.id;
+          card.classList.add('dragging');
+          ev.dataTransfer.effectAllowed = 'move';
+          try { ev.dataTransfer.setData('text/plain', note.id); } catch(e){}
+        });
+        card.addEventListener('dragend', () => { card.classList.remove('dragging'); dragSrcId = null; });
+
+        card.addEventListener('dragover', (ev) => {
+          ev.preventDefault();
+          ev.dataTransfer.dropEffect = 'move';
+          card.classList.add('ring-2','ring-slate-700');
+        });
+        card.addEventListener('dragleave', () => { card.classList.remove('ring-2','ring-slate-700'); });
+
+        card.addEventListener('drop', (ev) => {
+          ev.preventDefault();
+          card.classList.remove('ring-2','ring-slate-700');
+          const targetId = note.id;
+          const sourceId = dragSrcId || ev.dataTransfer.getData('text/plain');
+          if (!sourceId || sourceId === targetId) return;
+          handleReorder(sourceId, targetId);
+        });
+
+        notesGrid.appendChild(card);
+      });
+    }
+
+    function handleReorder(sourceId, targetId) {
+      // When user drags, we switch to manual ordering mode
+      manualOrdering = true;
+      toggleSort.checked = true;
+      // Build current order array
+      // If manualOrderIndex not set, initialize based on current order
+      notes = notes.map((n, idx) => ({ ...n, manualOrderIndex: (n.manualOrderIndex ?? idx) }));
+      const src = notes.find(n => n.id === sourceId);
+      const tgt = notes.find(n => n.id === targetId);
+      if (!src || !tgt) return;
+      const srcIndex = src.manualOrderIndex;
+      const tgtIndex = tgt.manualOrderIndex;
+      // Remove src and insert before target index (shift others)
+      const others = notes.filter(n => n.id !== sourceId).sort((a,b) => a.manualOrderIndex - b.manualOrderIndex);
+      const insertAt = others.findIndex(n => n.id === targetId);
+      others.splice(insertAt, 0, src);
+      // Reassign indices
+      others.forEach((n,i) => n.manualOrderIndex = i);
+      notes = others;
+      saveNotes();
+      renderNotes();
+    }
+
+    // UI wiring
+    newNoteBtn.addEventListener('click', createNote);
+    closeModal.addEventListener('click', closeModalFn);
+    saveBtn.addEventListener('click', saveEditing);
+    deleteBtn.addEventListener('click', () => { if (editingId && confirm('Delete note?')) deleteNote(editingId); });
+    toggleSort.addEventListener('change', (e) => {
+      manualOrdering = e.target.checked;
+      renderNotes();
+    });
+    resetBtn.addEventListener('click', () => {
+      // Clear manual ordering and auto-sort
+      notes = notes.map(n => { const clone = {...n}; delete clone.manualOrderIndex; return clone; });
+      manualOrdering = false;
+      toggleSort.checked = false;
+      saveNotes();
+      renderNotes();
+    });
+
+    // Keyboard shortcuts: n -> new note, / -> focus search? (not implemented), Esc -> close modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'n' && !modal.classList.contains('flex')) { e.preventDefault(); createNote(); }
+      if (e.key === 'Escape' && modal.classList.contains('flex')) { closeModalFn(); }
+    });
+
+    // Init
+    loadNotes();
+    renderNotes();
+
+    // Responsive touch: enable dragging on touch by longpress fallback
+    (function enableTouchDragFallback(){
+      let touchTimer = null;
+      let touchSrcId = null;
+      notesGrid.addEventListener('touchstart', (ev) => {
+        const t = ev.target.closest('[draggable="true"]');
+        if (!t) return;
+        touchSrcId = t.dataset.id;
+        touchTimer = setTimeout(() => {
+          // emulate dragstart by setting a class
+          t.classList.add('ring-2','ring-accent');
+          // we will let user tap another note to drop
+        }, 400);
+      }, {passive:true});
+      notesGrid.addEventListener('touchend', (ev) => {
+        clearTimeout(touchTimer);
+      });
+      notesGrid.addEventListener('touchcancel', () => clearTimeout(touchTimer));
+      // If user taps another card while we are in "dragging" state, perform reorder
+      notesGrid.addEventListener('click', (ev) => {
+        const dragging = [...notesGrid.querySelectorAll('.ring-accent')];
+        if (dragging.length === 0) return;
+        const tgt = ev.target.closest('[draggable="true"]');
+        if (!tgt) return;
+        const srcId = dragging[0].dataset.id;
+        const tgtId = tgt.dataset.id;
+        dragging[0].classList.remove('ring-2','ring-accent');
+        if (srcId && tgtId && srcId !== tgtId) handleReorder(srcId, tgtId);
+      });
+    })();
+
+    // Save on unload (ensure latest edits kept) — note: we cannot auto-save modal edits unless explicit save
+    window.addEventListener('beforeunload', () => saveNotes());
+  </script>
+</body>
+</html>

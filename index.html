@@ -4,16 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Keeprr</title>
-  <!-- Tailwind Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Tailwind config for dark mode and custom colors
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            primary: '#1f2937', // slate-800 feel
+            primary: '#1f2937',
             accent: '#10b981'
           }
         }
@@ -21,7 +19,6 @@
     }
   </script>
   <style>
-    /* Small custom styles for the modal backdrop and drag cursor */
     .modal-backdrop { background: rgba(2,6,23,0.7); }
     .dragging { opacity: 0.5; }
   </style>
@@ -110,7 +107,7 @@
     function nowISO() { return new Date().toISOString(); }
     function niceDate(iso) {
       const d = new Date(iso);
-      return d.toLocaleString();
+      return d.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
     }
 
     function loadNotes() {

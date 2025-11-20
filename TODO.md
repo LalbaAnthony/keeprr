@@ -1,3 +1,9 @@
 - [ ] Refacto vue TS + express TS
+  - [ ] Backend
+    - [ ] Renomer post en note
+    - [ ] Relier post et user
+    - [ ] Use dotenv
+    - [ ] Changer les champs de note et user pour fit, ajouter position sur note et implementer suggestion de GPT https://chatgpt.com/share/691efbbe-483c-8008-a2fb-9e3d1d3432e0
 - [ ] Faire synchro des donnée en fond comme pensé sur memo-minder
-- [ ] Suivre todo node ready to prod
+- [ ] Test de post service
+- [ ] Suivre todo node ready to prodo

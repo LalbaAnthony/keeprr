@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express'
 import { logService } from '../services/log.service'
 import { LogError } from '../errors/LogError'
 
-export const bypasses = ['/', '/health', '/swagger']
+export const bypasses = ['/', '/health']
 
 export const logMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {

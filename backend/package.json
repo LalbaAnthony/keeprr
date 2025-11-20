@@ -35,9 +35,6 @@
     "rimraf": "^6.0.1",
     "sequelize": "^6.32.1",
     "sqlite3": "^5.1.7",
-    "swagger": "^0.0.1",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
     "ts-node": "^10.9.2",
     "typeorm": "^0.3.26"
   },

@@ -1,7 +1,5 @@
 import express, { Express, Request, Response } from 'express'
 import { Return } from './types/utils/api.types'
-import swaggerUi from "swagger-ui-express"
-import swaggerDocument from "./swagger.json"
 import noteRoutes from './routes/note.routes'
 import userRoutes from './routes/user.routes'
 import authRoutes from './routes/auth.routes'
@@ -35,14 +33,6 @@ app.get('/', (req: Request, res: Response) => {
     message: '/ of the backend server',
   } as Return)
 })
-
-// Serve Swagger documentation
-if (process.env.NODE_ENV !== 'production') {
-  app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
-  console.log('Swagger documentation available at /swagger')
-} else {
-  console.warn('Swagger documentation is not available in production mode')
-}
 
 // Health check
 app.get('/health', (req: Request, res: Response) => {

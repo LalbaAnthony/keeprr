@@ -1,2 +1,3 @@
 - [ ] Refacto vue TS + express TS
 - [ ] Faire synchro des donnée en fond comme pensé sur memo-minder
+- [ ] Suivre todo node ready to prod

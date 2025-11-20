@@ -16,7 +16,6 @@ app.use(morgan('combined'))
 // Rate limiting
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 })) // 100 requests per 15 minutes
 
-
 app.listen(process.env.BACKEND_PORT, () => {
     console.log(`Server is running on internal address http://localhost:${process.env.BACKEND_PORT}`)
 })

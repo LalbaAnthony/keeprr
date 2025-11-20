@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import path from 'path'
 import { AccessTokenPayload } from '../types/utils/jwt.types'
 
-dotenv.config()
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') })
 
 const JWT_SECRET: string = process.env.BACKEND_JWT_SECRET ?? 'please-change-this'
 const JWT_EXPIRES: jwt.SignOptions['expiresIn'] = (process.env.BACKEND_JWT_EXPIRES as jwt.SignOptions['expiresIn']) ?? '15m'

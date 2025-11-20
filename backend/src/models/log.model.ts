@@ -60,7 +60,7 @@ export function initLogModel(sequelize: Sequelize) {
     timestamps: true,
     updatedAt: 'updated_at',
     createdAt: 'created_at',
-    tableName: 'tl_log', // cant use `log` as table name, it's a reserved keyword in PG
+    tableName: 'kpr_log', // cant use `log` as table name, it's a reserved keyword in PG
     underscored: true,
     indexes: [
       { fields: ['level'] },

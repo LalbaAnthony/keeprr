@@ -1,8 +1,8 @@
 - [ ] Refacto vue TS + express TS
   - [ ] Backend
+    - [x] Use dotenv
     - [ ] Faire en sorte que les user ne recup que ses notes
     - [ ] Ajouter user_id dans ajout et modif de notes
-    - [ ] Use dotenv
     - [ ] Ajouter position sur note et implementer suggestion de GPT https://chatgpt.com/share/691efbbe-483c-8008-a2fb-9e3d1d3432e0
     - [ ] Test de post service
   - [ ] Frontend

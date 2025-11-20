@@ -1,15 +1,15 @@
 import path from 'path'
 import fs from 'fs'
 import { sequelize } from './config/database'
-import { Post, User } from './models'
+import { Note, User } from './models'
 import { Model, ModelStatic } from 'sequelize'
 import { hashPassword, isHash } from './utils/password.utils'
 
 const seed = async () => {
   const models: { model: ModelStatic<Model>; file: string }[] = [
     {
-      model: Post,
-      file: 'post.seed.json'
+      model: Note,
+      file: 'note.seed.json'
     },
     {
       model: User,

@@ -20,8 +20,6 @@ export class UserService {
       [Op.or]: [
         { email: { [Op.like]: `%${search}%` } },
         { username: { [Op.like]: `%${search}%` } },
-        { first_name: { [Op.like]: `%${search}%` } },
-        { last_name: { [Op.like]: `%${search}%` } },
       ],
     }
   }

@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from 'express'
 import { Return } from './types/utils/api.types'
 import swaggerUi from "swagger-ui-express"
 import swaggerDocument from "./swagger.json"
-import postRoutes from './routes/post.routes'
+import noteRoutes from './routes/note.routes'
 import userRoutes from './routes/user.routes'
 import authRoutes from './routes/auth.routes'
 import { NotFound } from './errors/HttpError'
@@ -53,7 +53,7 @@ app.get('/health', (req: Request, res: Response) => {
 })
 
 // Register routes
-app.use('/posts', postRoutes)
+app.use('/notes', noteRoutes)
 app.use('/users', userRoutes)
 app.use('/auth', authRoutes)
 

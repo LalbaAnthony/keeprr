@@ -14,7 +14,7 @@ const sequelize = new Sequelize({
 (async () => {
     await sequelize.authenticate()
 })().then(async () => {
-    if (env === 'development') await sequelize.sync({ alter: true })
+    if (env === 'development') await sequelize.sync({ force: true }) 
 }).catch(error => {
     console.error('Unable to connect to the database:', error)
 })

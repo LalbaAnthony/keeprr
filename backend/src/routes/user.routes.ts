@@ -4,7 +4,6 @@ import { checkPermission } from '../middlewares/auth.middleware'
 
 const router = Router()
 
-router.get('/', checkPermission(), userController.getAll)
 router.post('/', checkPermission(), userController.create)
 router.get('/:id', checkPermission(), userController.getById)
 router.put('/:id', checkPermission(), userController.update)

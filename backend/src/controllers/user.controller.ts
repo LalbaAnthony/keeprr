@@ -1,30 +1,9 @@
 import { RequestHandler } from 'express'
 import { userService } from '../services/user.service'
 import { Return } from '../types/utils/api.types'
-import { parseOrder } from '../utils/sort.util'
 import { BadRequest, NotFound } from '../errors/HttpError'
-import { paginate } from '../utils/pagination.util'
 
 export class UserController {
-  public getAll: RequestHandler = async (req, res, next) => {
-    const page = Number(req.query.page) || 1
-    const limit = Number(req.query.limit) || 10
-    const search = String(req.query.search || '')
-    const order = parseOrder(req)
-
-    try {
-      const options = { search }
-
-      const count = await userService.count(options)
-      const pagination = paginate(page, limit, count)
-      const data = await userService.getAll({ pagination, order, ...options })
-
-      res.json({ pagination, data, message: 'Users retrieved successfully' } as Return)
-    } catch (err: Error | unknown) {
-      next(new Error((err as Error).message ?? 'Unable to retrieve users'))
-    }
-  }
-
   public getById: RequestHandler<{ id: string }> = async (req, res, next) => {
     const id = Number(req.params.id)
     try {

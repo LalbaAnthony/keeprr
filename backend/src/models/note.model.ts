@@ -1,8 +1,9 @@
 import { DataTypes, Model, Sequelize } from 'sequelize'
-import { PostAttributes, PostAttributesCreation } from '../types/models/post.types'
+import { NoteAttributes, NoteAttributesCreation } from '../types/models/note.types'
 
-export class Post extends Model<PostAttributes, PostAttributesCreation> implements PostAttributes {
+export class Note extends Model<NoteAttributes, NoteAttributesCreation> implements NoteAttributes {
   public id!: number
+  public user_id!: number
   public title!: string
   public content!: string
 
@@ -10,12 +11,17 @@ export class Post extends Model<PostAttributes, PostAttributesCreation> implemen
   public readonly updated_at!: Date
 }
 
-export function initPostModel(sequelize: Sequelize) {
-  Post.init({
+export function initNoteModel(sequelize: Sequelize) {
+  Note.init({
     id: {
       type: DataTypes.BIGINT,
       autoIncrement: true,
       primaryKey: true
+    },
+    user_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      field: 'user_id'
     },
     title: DataTypes.STRING(500),
     content: DataTypes.TEXT,
@@ -34,7 +40,7 @@ export function initPostModel(sequelize: Sequelize) {
     timestamps: true,
     updatedAt: 'updated_at',
     createdAt: 'created_at',
-    tableName: 'post',
+    tableName: 'note',
     underscored: true,
   })
 }

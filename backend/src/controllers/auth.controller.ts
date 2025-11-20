@@ -7,13 +7,13 @@ import { Return } from '../types/utils/api.types'
 export class AuthController {
     public register: RequestHandler = async (req, res, next) => {
         try {
-            const { email, password, username, first_name, last_name } = req.body
+            const { email, password, username } = req.body
             if (!email || !password || !username) {
                 next(new BadRequest('Missing required fields'))
                 return
             }
 
-            const user = await authService.register({ email, password, username, first_name, last_name, status: 'active' })
+            const user = await authService.register({ email, password, username, status: 'active' })
             res.status(201).json({ data: user, message: 'User registered' } as Return)
         } catch (err: unknown) {
             next(new BadRequest((err as Error).message ?? 'Unable to register user'))

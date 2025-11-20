@@ -1,13 +1,13 @@
-import { Post } from '../models'
+import { Note } from '../models'
 import { WhereOptions } from 'sequelize'
 import { Pagination } from '../types/utils/pagination.types'
 import { Transaction } from 'sequelize'
 import { sequelize } from '../config/database'
 import { Order } from '../types/utils/sort.types'
-import { PostAttributes, PostAttributesCreation, PostAttributesUpdate } from '../types/models/post.types'
+import { NoteAttributes, NoteAttributesCreation, NoteAttributesUpdate } from '../types/models/note.types'
 import { Op } from 'sequelize'
 
-export class PostService {
+export class NoteService {
   private search(where: WhereOptions, search?: string): WhereOptions {
     if (search) {
       where = {
@@ -29,10 +29,10 @@ export class PostService {
 
     where = this.search(where, search)
 
-    return Post.count({ where })
+    return Note.count({ where })
   }
 
-  public async getAll(options: { search?: string; pagination: Pagination; order?: Order; }): Promise<PostAttributes[]> {
+  public async getAll(options: { search?: string; pagination: Pagination; order?: Order; }): Promise<NoteAttributes[]> {
     const { order, pagination, search } = options
     const { offset, limit } = pagination
 
@@ -40,35 +40,35 @@ export class PostService {
 
     where = this.search(where, search)
 
-    return Post.findAll({ where, order, offset, limit })
+    return Note.findAll({ where, order, offset, limit })
   }
 
-  public async getById(id: number): Promise<PostAttributes | null> {
-    const post = await Post.findOne({ where: { id } })
-    return post
+  public async getById(id: number): Promise<NoteAttributes | null> {
+    const note = await Note.findOne({ where: { id } })
+    return note
   }
 
-  public async create(data: PostAttributesCreation): Promise<PostAttributes | null> {
+  public async create(data: NoteAttributesCreation): Promise<NoteAttributes | null> {
     return sequelize.transaction(async (t: Transaction) => {
-      const post = await Post.create(data, { transaction: t })
-      return post
-    }).then(async (post) => {
-      return await this.getById(post.id)
+      const note = await Note.create(data, { transaction: t })
+      return note
+    }).then(async (note) => {
+      return await this.getById(note.id)
     })
   }
 
-  public async update(id: number, data: PostAttributesUpdate): Promise<PostAttributes | null> {
+  public async update(id: number, data: NoteAttributesUpdate): Promise<NoteAttributes | null> {
     return sequelize.transaction(async (t: Transaction) => {
-      await Post.update(data, { where: { id }, transaction: t })
+      await Note.update(data, { where: { id }, transaction: t })
     }).then(async () => {
       return this.getById(id)
     })
   }
 
   public async delete(id: number): Promise<number> {
-    const result = await Post.destroy({ where: { id } })
+    const result = await Note.destroy({ where: { id } })
     return result
   }
 }
 
-export const postService = new PostService()
+export const noteService = new NoteService()

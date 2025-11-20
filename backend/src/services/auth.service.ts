@@ -12,7 +12,7 @@ import { NotFound } from '../errors/HttpError'
 
 export class AuthService {
     public async register(payload: UserAttributesCreation) {
-        const { email, password, username, first_name, last_name, status = 'active' } = payload
+        const { email, password, username, status = 'active' } = payload
 
         if (!isEmail(email)) throw new Error('Invalid email')
         const existingEMail = await userService.getByEmail(email)
@@ -25,14 +25,12 @@ export class AuthService {
         if (!isStrongPassword(password)) throw new Error('Too weak password')
 
         const hash = await hashPassword(password)
-        const user = await userService.create({ email, password: hash, username, first_name, last_name, status })
+        const user = await userService.create({ email, password: hash, username, status })
 
         return {
             id: user.id,
             email: user.email,
             username: user.username,
-            first_name: user.first_name,
-            last_name: user.last_name,
         }
     }
 
@@ -67,8 +65,6 @@ export class AuthService {
                 id: user.id,
                 email: user.email,
                 username: user.username,
-                first_name: user.first_name,
-                last_name: user.last_name,
             }
         }
     }

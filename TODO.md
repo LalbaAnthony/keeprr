@@ -1,9 +1,14 @@
 - [ ] Refacto vue TS + express TS
   - [ ] Backend
-    - [ ] Renomer post en note
-    - [ ] Relier post et user
+    - [ ] Faire en sorte que les user ne recup que ses notes
+    - [ ] Ajouter user_id dans ajout et modif de notes
     - [ ] Use dotenv
-    - [ ] Changer les champs de note et user pour fit, ajouter position sur note et implementer suggestion de GPT https://chatgpt.com/share/691efbbe-483c-8008-a2fb-9e3d1d3432e0
-- [ ] Faire synchro des donnée en fond comme pensé sur memo-minder
-- [ ] Test de post service
-- [ ] Suivre todo node ready to prodo
+    - [ ] Ajouter position sur note et implementer suggestion de GPT https://chatgpt.com/share/691efbbe-483c-8008-a2fb-9e3d1d3432e0
+    - [ ] Test de post service
+  - [ ] Frontend
+    - [ ] Faire synchro des données en fond comme pensé sur memo-minder
+- [ ] Suppr reset de mdp ou ajouter system emailing
+- [ ] Faire antho-tools/node/processes/prod_checkup.md
+- [ ] Pipe for MEP et MEPP
+- [ ] MEP
+- [ ] MEPP

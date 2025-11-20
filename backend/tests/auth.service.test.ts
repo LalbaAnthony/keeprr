@@ -24,8 +24,6 @@ const mockUser = {
     id: 1,
     email: 'john@example.com',
     username: 'johnny',
-    first_name: 'John',
-    last_name: 'Doe',
     password: 'hashed123',
     status: 'active' as UserStatus,
     created_at: new Date(),
@@ -36,7 +34,6 @@ describe('AuthService', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
-
 
     describe('register', () => {
         it('should create a new user successfully', async () => {
@@ -50,8 +47,6 @@ describe('AuthService', () => {
                 email: mockUser.email,
                 username: mockUser.username,
                 password: 'StrongPass123!',
-                first_name: mockUser.first_name,
-                last_name: mockUser.last_name,
                 status: 'active',
             })
 
@@ -67,8 +62,6 @@ describe('AuthService', () => {
                     email: mockUser.email,
                     username: mockUser.username,
                     password: 'StrongPass123!',
-                    first_name: mockUser.first_name,
-                    last_name: mockUser.last_name,
                     status: 'active',
                 })
             ).rejects.toThrow('Email already in use')

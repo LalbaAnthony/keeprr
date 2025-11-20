@@ -6,7 +6,8 @@
     "exec": "ts-node src/server.ts",
     "ignore": [
         "dist",
-        "node_modules"
+        "node_modules",
+        "seeds"
     ],
     "env": {
         "NODE_ENV": "development",

@@ -82,6 +82,7 @@ web_modules/
 .env.test.local
 .env.preprod.local
 .env.prod.local
+.env.development
 .env.local
 
 # parcel-bundler cache (https://parceljs.org/)
@@ -145,5 +146,3 @@ dist
 # End of https://www.toptal.com/developers/gitignore/api/node
 
 *.sqlite
-
-data/*.json

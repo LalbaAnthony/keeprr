@@ -1,0 +1,20 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Keeprr | API",
+        "version": "1.0.0",
+        "description": "All the API endpoints for Keeprr"
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Use the JWT token obtained from the login endpoint. The token should be prefixed with 'Bearer ' in the Authorization header."
+            }
+        },
+        "schemas": {}
+    },
+    "paths": {}
+}

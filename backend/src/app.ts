@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }))
 // CORS middleware to allow cross-origin requests. It MUST be before any route cuz of preflight requests
 app.use(cors({
     origin: process.env.BACKEND_CORS_ORIGIN || '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
 }))
 
